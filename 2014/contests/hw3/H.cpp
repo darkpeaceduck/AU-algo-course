@@ -30,7 +30,7 @@
 #define mp make_pair
 #define pb push_back
 #define lo unsigned int
-#define li unsigned long long int
+#define li long long int
 #define db double
 #define pb push_back
 #define FOR(i, n) for(lo (i) = 0; (i) < (n); (i)++)
@@ -46,64 +46,60 @@ const li INF = (1LL<<62) ;
 using namespace std;
 
 unsigned int cur = 0;
-unsigned int ra24(lo a, lo b)
+unsigned int ra(unsigned int a,unsigned int b)
 {
-    cur = cur * a + b;
-    return cur >> 8;
+	cur = cur * a + b;
+	return cur >> 8;
 }
-unsigned long long ra32(int A, int B)
+lo A[MN], sum[MN];
+li mod = (1LL<<32);
+
+lo gsum(li a,li b)
 {
-    unsigned long long a = ra24(A, B), b = ra24(A, B);
-    return (a << 8) ^ b;
+	return (a + b);
 }
-
-
 int main()
 {
 #ifdef MYLOCAL
-    freopen("input.txt", "r", stdin);
-    // freopen("perm.out", "w", stdout);
+	freopen("input.txt", "r", stdin);
+	// freopen("perm.out", "w", stdout);
 #else
-    freopen("linesum.in", "r", stdin);
-    freopen("linesum.out", "w",stdout);
+	freopen("fastadd.in", "r", stdin);
+	freopen("fastadd.out", "w",stdout);
 #endif
-    lo m, q;
-    cin >> m >> q;
-    lo a, b;
-    cin >> a >> b;
-    vector<pair<li, li> > go(m);
-    FOR(i, m)
-    {
-        li val = ra32(a, b);
-        li x = ra32(a, b);
-        go[i] = mp(x, val);
-    }
-  sort(go.begin(), go.end());
-    vector<lo> sum(m  );
-    sum[0] = go[0].second;
-    for(lo i = 1; i < m; i++)
-    {
-        sum[i] = sum[i - 1] + go[i].second;
-    }
+	lo m, q;
+	cin >> m >> q;
+	lo a, b;
+	cin >> a >> b;
+	FOR(i, m)
+	{
+		lo add = ra(a, b);
+		lo l = ra(a, b);
+		lo r= ra(a, b);
+		if(l > r)
+			swap(l, r);
+		A[l] = gsum(A[l], add);
+		A[r + 1] = gsum(A[r + 1] , mod-add);
 
-    lo ans = 0;
-    FOR(i, q)
-    {
-        li l = ra32(a, b);
-        li r= ra32(a,b);
-        if(l > r)
-            swap(l, r);
+	}
+	lo ans = 0;
+	lo now = 0;
+	FOR(i, MN)
+	{
+		now = gsum(now, A[i]);
+		sum[i] = gsum(i ? sum[i - 1] : 0, now);
+	}
+	FOR(i, q)
+	{
+		lo l = ra(a, b);
+		lo r= ra(a, b);
+		if(l > r)
+			swap(l, r);
 
-//        /*
-        if(go[0].first > r)
-            continue;
-        lo id = upper_bound(go.begin(), go.end(), mp(r, INF)) - go.begin();
-        id--;
-        lo id2 = upper_bound(go.begin(), go.end(), mp(l - 1, INF)) - go.begin();
-        lo val = sum[id]  -  (id2 ? sum[id2 - 1] : 0);
-        ans += val;
-
-    }
-  //  cout << ans2 << endl;
-    cout << ans ;
+		lo val = gsum(sum[r] ,mod- (l ? sum[l - 1] : 0));
+		ans = gsum(ans, val);
+		//cout << ans << " " << ans2 << endl;
+	}
+	//cout << ans2 % mod<< endl;
+	cout << ans;
 }

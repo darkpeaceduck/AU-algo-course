@@ -30,7 +30,7 @@
 #define mp make_pair
 #define pb push_back
 #define lo int
-#define li int
+#define li long long int
 #define db double
 #define pb push_back
 #define FOR(i, n) for(lo (i) = 0; (i) < (n); (i)++)
@@ -45,43 +45,38 @@ const li INF = (1LL<<62) ;
 
 using namespace std;
 
+struct info
+{
+	lo task, f, id;
+	info(lo a, lo b, lo c) : task(a), f(b), id(c){}
+	info() {}
+	bool operator<(const info & b) const
+	{
+		return (task > b.task) || (task == b.task && f < b.f) ||
+				(task == b.task && f == b.f && id < b.id);
+	}
+};
 int main()
 {
-	#ifdef MYLOCAL
-	freopen("input.txt", "r", stdin);
-	// freopen("perm.out", "w", stdout);
-	#else
-	freopen("sleepgame.in", "r", stdin);
-	freopen("sleepgame.out", "w",stdout);
-	#endif
-	li mod = (1<<30);
-	lo n, k;
-	cin >> n >> k;
-	deque<li> d;
-	FOR(i, n)
-	{
-		li a;
-		scanf("%d", &a);
-		d.push_back(a);
-	}
-	FOR(i, k)
-	{
-		li x = d.front();
-		li y = d.back();
-		if(x < y)
-		{
-			d.pop_front();
-			d.push_back((x + y) % mod);
-		}
-		else
-		{
-			d.pop_back();
-			d.push_front((y + mod - x ) % mod);
-		}
-	}
-	while(!d.empty())
-	{
-		printf("%d ", d.front());
-		d.pop_front();
-	}
+#ifdef MYLOCAL
+   freopen("input.txt", "r", stdin);
+  // freopen("perm.out", "w", stdout);
+#else
+    freopen("ejudge.in", "r", stdin);
+    freopen("ejudge.out", "w",stdout);
+#endif
+    lo n;
+    cin >> n;
+    vector<info> g;
+    FOR(i, n)
+    {
+    	lo a, b;
+    	scanf("%d%d", &a, &b);
+    	g.pb(info(a, b, i));
+    }
+    sort(g.begin(), g.end());
+    FOR(i, n)
+    {
+    	printf("%d ", g[i].id + 1);
+    }
 }

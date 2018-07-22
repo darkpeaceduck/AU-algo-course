@@ -29,15 +29,15 @@
 
 #define mp make_pair
 #define pb push_back
-#define lo int
-#define li long long int
+#define lo long long  int
+#define li unsigned long long int
 #define db double
 #define pb push_back
 #define FOR(i, n) for(lo (i) = 0; (i) < (n); (i)++)
 #define all(a) (a).begin(), (a).end()
 #define pi 3.14159265358979323
 #define eps 1e-9
-#define MN 1000100
+#define MN 1<<24
 #define sz(n) (lo) (n).size()
 #define SM 32
 #define DEB(...) fprintf(stderr,__VA_ARGS__)
@@ -46,130 +46,102 @@ const li INF = (1LL<<62) ;
 using namespace std;
 
 
-struct Set
+bool isdigit(char a)
 {
-	lo  *a;
-	lo NUMS;
-	lo SIZE;
-	Set():NUMS(0), SIZE(2) {a = new int [SIZE]; FOR(i, SIZE) a[i] = -1;}
-
-	void x2()
-	{
-		lo NEWSIZE = SIZE * 2;
-		lo  *b = new int [NEWSIZE];
-		FOR(i, NEWSIZE)
-			b[i] = -1;
-		FOR(i, SIZE)
-		{
-			if(a[i] == -1)
-				continue;
-			lo at = a[i] % NEWSIZE;
-			while(b[at] != -1)
-			{
-				at++;
-				if(at == NEWSIZE)
-					at = 0;
-			}
-			b[at] = a[i];
-		}
-		clear();
-		a = b;
-		SIZE =NEWSIZE;
-	}
-	void insert(lo el)
-	{
-		lo in = el % SIZE;
-		while(a[in] != -1)
-		{
-			if(a[in] == el)
-				return;
-			in++;
-			if(in == SIZE)
-				in = 0;
-		}
-		a[in] = el;
-		NUMS++;
-		while(NUMS * 2== SIZE)
-			x2();
-	}
-
-	lo size()
-	{
-		return NUMS;
-	}
-	lo realsize()
-	{
-		return SIZE;
-	}
-	void clear()
-	{
-		delete [](a);
-	}
-};
-vector<lo> g[MN];
-lo color[MN];
-lo ans[MN];
-Set * in[MN];
-Set* merge(Set *f, Set *s)
-{
-	if(sz((*f)) > sz((*s)))
-		swap(f, s);
-	FOR(i, f->realsize())
-	{
-		if((f->a)[i] != -1)
-			s->insert((f->a)[i]);
-	}
-	//f->clear();
-	//delete(f);
-	return s;
+	return a - '0' >= 0 && '9' - a >= 0;
 }
 
-void dfs(lo id, lo p)
+lo priority(char a)
 {
-	in[id] = new Set();
-	in[id]->insert(color[id]);
-	FOR(i, sz(g[id]))
-	{
-		lo to = g[id][i];
-		if(to == p)
-			continue;
-		dfs(to, id);
-		in[id] = merge(in[id], in[to]);
-	}
-
-	ans[id] = sz(*in[id]);
+	if(a == '/' || a == '*')
+		return 2;
+	if(a == '-')
+		return 1;
+	if(a == '+')
+		return 0;
+	return -1;
 }
 
-
+void doexpr(vector<char> &Do, vector<lo> &Numb)
+{
+	lo r = Numb.back();
+	Numb.pop_back();
+	lo l = Numb.back();
+	Numb.pop_back();
+	char with = Do.back();
+	Do.pop_back();
+	lo res;
+	switch(with)
+	{
+		case '+': res = l + r; break;
+		case '-': res = l - r; break;
+		case '*': res = l * r; break;
+		case '/': res = l / r; break;
+	}
+	Numb.pb(res);
+}
 int main()
 {
 #ifdef MYLOCAL
     freopen("input.txt", "r", stdin);
     // freopen("perm.out", "w", stdout);
 #else
-    freopen("tree.in", "r", stdin);
-    freopen("tree.out", "w",stdout);
+    freopen("evalhard.in", "r", stdin);
+    freopen("evalhard.out", "w",stdout);
 #endif
-    lo n;
-    cin >> n;
-    lo root = 0;
-    FOR(i, n )
+    string s;
+    cin >> s;
+    s = "(" + s +")";
+    vector<char> Do;
+    vector<lo> Numb;
+    FOR(i, sz(s))
     {
-    	lo a, b;
-    	scanf("%d%d", &a, &b);
-    	a--;
-    	if(a == -1)
+    	if(isdigit(s[i]))
     	{
-    		root = i;
+    		lo val = 0;
+    		for(; i < sz(s) && isdigit(s[i]); i++)
+    		{
+    			val *= 10;
+    			val += s[i] - '0';
+    		}
+    		i--;
+    		Numb.pb(val);
+    	}
+    	else if(s[i] == ')')
+    	{
+    		/*FOR(i, sz(Do))
+				DEB("%c ", Do[i]);
+    		DEB("\n");
+    		FOR(i, sz(Numb))
+					DEB("%d ", Numb[i]);
+    		DEB("\n");
+    		*/
+    		while(Do.back() != '(')
+    		{
+    			doexpr(Do, Numb);
+    		}
+    		Do.pop_back();
     	}
     	else
-    		g[a].pb(i);
-    	color[i] = b;
-    }
-    dfs(root, -1);
-    FOR(i, n)
-    {
-    	printf("%d ", ans[i]);
-    }
+    	{
 
+    		if(s[i] != '(')
+    		{
+    			/*DEB("here\n");
+    			FOR(i, sz(Do))
+					DEB("%c ", Do[i]);
+				DEB("\n");
+				FOR(i, sz(Numb))
+						DEB("%d ", Numb[i]);
+				DEB("\n");
+				*/
+				while(!Do.empty() && Do.back()!= '(' && priority(Do.back()) >= priority(s[i]))
+				{
+					doexpr(Do, Numb);
+				}
+    		}
+    		Do.pb(s[i]);
+    	}
+    }
+    cout << Numb.back();
 }

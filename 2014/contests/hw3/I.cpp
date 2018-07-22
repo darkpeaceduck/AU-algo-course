@@ -29,7 +29,7 @@
 
 #define mp make_pair
 #define pb push_back
-#define lo long long  int
+#define lo unsigned int
 #define li unsigned long long int
 #define db double
 #define pb push_back
@@ -45,103 +45,65 @@ const li INF = (1LL<<62) ;
 
 using namespace std;
 
-
-bool isdigit(char a)
+unsigned int cur = 0;
+unsigned int ra24(lo a, lo b)
 {
-	return a - '0' >= 0 && '9' - a >= 0;
+    cur = cur * a + b;
+    return cur >> 8;
+}
+unsigned long long ra32(int A, int B)
+{
+    unsigned long long a = ra24(A, B), b = ra24(A, B);
+    return (a << 8) ^ b;
 }
 
-lo priority(char a)
-{
-	if(a == '/' || a == '*')
-		return 2;
-	if(a == '-')
-		return 1;
-	if(a == '+')
-		return 0;
-	return -1;
-}
 
-void doexpr(vector<char> &Do, vector<lo> &Numb)
-{
-	lo r = Numb.back();
-	Numb.pop_back();
-	lo l = Numb.back();
-	Numb.pop_back();
-	char with = Do.back();
-	Do.pop_back();
-	lo res;
-	switch(with)
-	{
-		case '+': res = l + r; break;
-		case '-': res = l - r; break;
-		case '*': res = l * r; break;
-		case '/': res = l / r; break;
-	}
-	Numb.pb(res);
-}
 int main()
 {
 #ifdef MYLOCAL
     freopen("input.txt", "r", stdin);
     // freopen("perm.out", "w", stdout);
 #else
-    freopen("evalhard.in", "r", stdin);
-    freopen("evalhard.out", "w",stdout);
+    freopen("linesum.in", "r", stdin);
+    freopen("linesum.out", "w",stdout);
 #endif
-    string s;
-    cin >> s;
-    s = "(" + s +")";
-    vector<char> Do;
-    vector<lo> Numb;
-    FOR(i, sz(s))
+    lo m, q;
+    cin >> m >> q;
+    lo a, b;
+    cin >> a >> b;
+    vector<pair<li, li> > go(m);
+    FOR(i, m)
     {
-    	if(isdigit(s[i]))
-    	{
-    		lo val = 0;
-    		for(; i < sz(s) && isdigit(s[i]); i++)
-    		{
-    			val *= 10;
-    			val += s[i] - '0';
-    		}
-    		i--;
-    		Numb.pb(val);
-    	}
-    	else if(s[i] == ')')
-    	{
-    		/*FOR(i, sz(Do))
-				DEB("%c ", Do[i]);
-    		DEB("\n");
-    		FOR(i, sz(Numb))
-					DEB("%d ", Numb[i]);
-    		DEB("\n");
-    		*/
-    		while(Do.back() != '(')
-    		{
-    			doexpr(Do, Numb);
-    		}
-    		Do.pop_back();
-    	}
-    	else
-    	{
-
-    		if(s[i] != '(')
-    		{
-    			/*DEB("here\n");
-    			FOR(i, sz(Do))
-					DEB("%c ", Do[i]);
-				DEB("\n");
-				FOR(i, sz(Numb))
-						DEB("%d ", Numb[i]);
-				DEB("\n");
-				*/
-				while(!Do.empty() && Do.back()!= '(' && priority(Do.back()) >= priority(s[i]))
-				{
-					doexpr(Do, Numb);
-				}
-    		}
-    		Do.pb(s[i]);
-    	}
+        li val = ra32(a, b);
+        li x = ra32(a, b);
+        go[i] = mp(x, val);
     }
-    cout << Numb.back();
+  sort(go.begin(), go.end());
+    vector<lo> sum(m  );
+    sum[0] = go[0].second;
+    for(lo i = 1; i < m; i++)
+    {
+        sum[i] = sum[i - 1] + go[i].second;
+    }
+
+    lo ans = 0;
+    FOR(i, q)
+    {
+        li l = ra32(a, b);
+        li r= ra32(a,b);
+        if(l > r)
+            swap(l, r);
+
+//        /*
+        if(go[0].first > r)
+            continue;
+        lo id = upper_bound(go.begin(), go.end(), mp(r, INF)) - go.begin();
+        id--;
+        lo id2 = upper_bound(go.begin(), go.end(), mp(l - 1, INF)) - go.begin();
+        lo val = sum[id]  -  (id2 ? sum[id2 - 1] : 0);
+        ans += val;
+
+    }
+  //  cout << ans2 << endl;
+    cout << ans ;
 }

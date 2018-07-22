@@ -45,38 +45,29 @@ const li INF = (1LL<<62) ;
 
 using namespace std;
 
-struct info
-{
-	lo task, f, id;
-	info(lo a, lo b, lo c) : task(a), f(b), id(c){}
-	info() {}
-	bool operator<(const info & b) const
-	{
-		return (task > b.task) || (task == b.task && f < b.f) ||
-				(task == b.task && f == b.f && id < b.id);
-	}
-};
+
 int main()
 {
 #ifdef MYLOCAL
    freopen("input.txt", "r", stdin);
   // freopen("perm.out", "w", stdout);
 #else
-    freopen("ejudge.in", "r", stdin);
-    freopen("ejudge.out", "w",stdout);
+    freopen("find2.in", "r", stdin);
+    freopen("find2.out", "w",stdout);
 #endif
-    lo n;
-    cin >> n;
-    vector<info> g;
+    lo n, m;
+    cin >> n>> m;
+    set<lo> g;
     FOR(i, n)
     {
-    	lo a, b;
-    	scanf("%d%d", &a, &b);
-    	g.pb(info(a, b, i));
+    	lo a;
+    	scanf("%d", &a);
+    	g.insert(a);
     }
-    sort(g.begin(), g.end());
-    FOR(i, n)
+    FOR(i, m)
     {
-    	printf("%d ", g[i].id + 1);
+    	lo a;
+    	scanf("%d", &a);
+    	printf(g.count(a) ? "YES\n" : "NO\n");
     }
 }

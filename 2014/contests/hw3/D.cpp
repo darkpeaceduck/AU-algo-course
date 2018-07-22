@@ -29,15 +29,15 @@
 
 #define mp make_pair
 #define pb push_back
-#define lo int
-#define li long long int
+#define lo unsigned int
+#define li unsigned long long int
 #define db double
 #define pb push_back
 #define FOR(i, n) for(lo (i) = 0; (i) < (n); (i)++)
 #define all(a) (a).begin(), (a).end()
 #define pi 3.14159265358979323
 #define eps 1e-9
-#define MN 8000000
+#define MN 1024
 #define sz(n) (lo) (n).size()
 #define SM 32
 #define DEB(...) fprintf(stderr,__VA_ARGS__)
@@ -46,28 +46,49 @@ const li INF = (1LL<<62) ;
 using namespace std;
 
 
+
+char mo[MN][MN];
+int ma[MN][MN];
 int main()
 {
 #ifdef MYLOCAL
-   freopen("input.txt", "r", stdin);
-  // freopen("perm.out", "w", stdout);
+    freopen("input.txt", "r", stdin);
+    // freopen("perm.out", "w", stdout);
 #else
-    freopen("find2.in", "r", stdin);
-    freopen("find2.out", "w",stdout);
+    freopen("plusminus.in", "r", stdin);
+    freopen("plusminus.out", "w",stdout);
 #endif
     lo n, m;
-    cin >> n>> m;
-    set<lo> g;
+    cin >> n >> m;
+    scanf("\n");
     FOR(i, n)
     {
-    	lo a;
-    	scanf("%d", &a);
-    	g.insert(a);
+        scanf("%s", &mo[i]);
+        FOR(j ,m)
+            ma[i][j]= (mo[i][j] == '+');
     }
-    FOR(i, m)
+    FOR(i, n - 1)
     {
-    	lo a;
-    	scanf("%d", &a);
-    	printf(g.count(a) ? "YES\n" : "NO\n");
+        FOR(j, m - 1)
+        {
+            if(ma[i][j] == 0)
+            {
+                ma[i][j] = 1- ma[i][j];
+                ma[i][j + 1] = 1 - ma[i][j + 1];
+                ma[i + 1][j] = 1- ma[i + 1][j];
+                ma[i + 1][j + 1] = 1 - ma[i + 1][j + 1];
+
+            }
+        }
     }
+    FOR(i, n) FOR(j, m)
+        {
+            if(ma[i][j] != 1)
+            {
+                cout << "No";
+                return 0;
+            }
+
+        }
+    cout << "Yes";
 }
